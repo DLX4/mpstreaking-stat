@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <property name="LOG_HOME" value="./logs"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/stat.%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+            </pattern>
+        </encoder>
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="SQLFILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/stat-Sql.%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} -
+                %msg%n
+            </pattern>
+        </encoder>
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+    <!-- 级别依次为【从高到低】：FATAL > ERROR > WARN > INFO > DEBUG > TRACE -->
+    <logger name="com.zjipst" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="com.zjipst.yun110.service.mapper" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="org.springframework.jdbc.core" level="DEBUG" additivity="false">
+        <appender-ref ref="SQLFILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="com.zjipst.psc110.dao" level="DEBUG" additivity="false">
+        <appender-ref ref="SQLFILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="com.zjipst.yun110.stat.aspect.Psc110DataSourceSwitchAspect" level="DEBUG" additivity="false">
+        <appender-ref ref="SQLFILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.zjipst.yun110.stat.aspect.Yun110DataSourceSwitchAspect" level="DEBUG" additivity="false">
+        <appender-ref ref="SQLFILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.zjipst.yun110.stat" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!--     <logger name="org.springframework.jdbc" level="TRACE" additivity="false">
+             <appender-ref ref="FILE"/>
+             <appender-ref ref="STDOUT"/>
+        </logger>
+
+        <logger name="com.ibatis" level="TRACE" additivity="false">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="STDOUT"/>
+        </logger>
+
+        <logger name="java.sql" level="TRACE" additivity="false">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="STDOUT"/>
+        </logger>-->
+
+</configuration>
+
