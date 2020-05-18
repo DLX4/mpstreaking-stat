@@ -21,8 +21,8 @@
 示例1：复杂存储过程实现统计需求，创建中间表，最后将统计结果写入到结果表
 
 ```sql
-var ksbjsj = get("ksbjsj");
-var jsbjsj = get("jsbjsj");
+var kscol2 = get("kscol2");
+var jscol2 = get("jscol2");
 
 var id1 = snowflake();
 var id2 = snowflake();
@@ -35,23 +35,23 @@ var tmp3 = "tmp3" + id3;
 var tmp4 = "tmp4" + id4;
 /* 创建临时表 */
 $<psc110::
-create table {{tmp2}} as select jjdbh,bjsj,bjdh from table1 where 1=2
+create table {{tmp2}} as select col1,col2,col3 from table1 where 1=2
 >;
 
 $<psc110::
-create table {{tmp4}} as select bjdh,min(bjsj) bjsj,count(jjdbh) sl from table1
-where bjsj>to_date('{{ksbjsj}}','yyyymmdd')
-and bjsj<to_date('{{jsbjsj}}','yyyymmdd')
-and jjdcllxdm =10
-group by bjdh,to_char(bjsj,'yyyymmdd')
+create table {{tmp4}} as select col3,min(col2) col2,count(col1) sl from table1
+where col2>to_date('{{kscol2}}','yyyymmdd')
+and col2<to_date('{{jscol2}}','yyyymmdd')
+and col4 =10
+group by col3,to_char(col2,'yyyymmdd')
 >;
 
 $<psc110::
-create table {{tmp1}} as select bjdh,min(bjsj) bjsj,count(jjdbh) sl from table1
-where bjsj>to_date('{{ksbjsj}}','yyyymmdd')
-and bjsj<to_date('{{jsbjsj}}','yyyymmdd')
-and jjdcllxdm in(3,5,9,11,12,13)
-group by bjdh,to_char(bjsj,'yyyymmdd')
+create table {{tmp1}} as select col3,min(col2) col2,count(col1) sl from table1
+where col2>to_date('{{kscol2}}','yyyymmdd')
+and col2<to_date('{{jscol2}}','yyyymmdd')
+and col4 in(3,5,9,11,12,13)
+group by col3,to_char(col2,'yyyymmdd')
 >;
 /* 中间计算过程 */
 $<psc110::
@@ -61,31 +61,31 @@ declare
   sql1 varchar2(2000);
 begin
 
-  for a in (select distinct bjdh
+  for a in (select distinct col3
               from table1
-             where bjsj > to_date('{{ksbjsj}}','yyyymmdd')
-               and bjsj < to_date('{{jsbjsj}}','yyyymmdd')
-               and jjdcllxdm = 10
-               and bjdh is not null) loop
+             where col2 > to_date('{{kscol2}}','yyyymmdd')
+               and col2 < to_date('{{jscol2}}','yyyymmdd')
+               and col4 = 10
+               and col3 is not null) loop
     aa := 1;
-    for b in (select jjdbh, bjdh, bjsj
+    for b in (select col1, col3, col2
                 from table1
-               where bjsj > to_date('{{ksbjsj}}','yyyymmdd')
-                 and bjsj < to_date('{{jsbjsj}}','yyyymmdd')
-                 and jjdcllxdm = 10
-                 and bjdh = a.bjdh
-               order by bjsj ) loop
+               where col2 > to_date('{{kscol2}}','yyyymmdd')
+                 and col2 < to_date('{{jscol2}}','yyyymmdd')
+                 and col4 = 10
+                 and col3 = a.col3
+               order by col2 ) loop
       if aa = '1' then
-        aa := b.jjdbh;
-        a2 := b.bjsj;
-        insert into {{tmp2}} values (b.jjdbh, b.bjsj, b.bjdh);
+        aa := b.col1;
+        a2 := b.col2;
+        insert into {{tmp2}} values (b.col1, b.col2, b.col3);
         commit;
       else
-        if (cast(b.bjsj as date) - cast(a2 as date))*24*60 > 60 then
-          insert into {{tmp2}} values (b.jjdbh, b.bjsj, b.bjdh);
+        if (cast(b.col2 as date) - cast(a2 as date))*24*60 > 60 then
+          insert into {{tmp2}} values (b.col1, b.col2, b.col3);
           commit;
-          aa := b.jjdbh;
-          a2 := b.bjsj;
+          aa := b.col1;
+          a2 := b.col2;
         else
           continue;
         end if;
@@ -97,46 +97,46 @@ end;
 >;
 
 var result1 = $<psc110::
-with temp1 as (select nvl(afxzqh,xzqh) xzqh,jjdbh,bjsj,bjnr,bjdh from table1
-where bjsj>to_date('{{ksbjsj}}','yyyymmdd')
-and bjsj<to_date('{{jsbjsj}}','yyyymmdd') ) ,
+with temp1 as (select nvl(afcol6,col6) col6,col1,col2,col5,col3 from table1
+where col2>to_date('{{kscol2}}','yyyymmdd')
+and col2<to_date('{{jscol2}}','yyyymmdd') ) ,
 temp2 as
 (select * from {{tmp2}})
-select c.xzqh,d.name,c.sl from(
-select xzqh,sum(sl) sl from(
-(select substr(a.xzqh,1,4)||'01' xzqh,sl from(
-select temp1.xzqh,count(temp1.jjdbh) sl from temp1,temp2
-where temp1.bjdh=temp2.bjdh
-and (cast(temp1.bjsj as date)-cast(temp2.bjsj as date))*24*60>10
-and (cast(temp1.bjsj as date)-cast(temp2.bjsj as date))*24*60<60
-group by temp1.xzqh )a,
-zd_xzqh b
-where a.xzqh=b.id
+select c.col6,d.name,c.sl from(
+select col6,sum(sl) sl from(
+(select substr(a.col6,1,4)||'01' col6,sl from(
+select temp1.col6,count(temp1.col1) sl from temp1,temp2
+where temp1.col3=temp2.col3
+and (cast(temp1.col2 as date)-cast(temp2.col2 as date))*24*60>10
+and (cast(temp1.col2 as date)-cast(temp2.col2 as date))*24*60<60
+group by temp1.col6 )a,
+zd_col6 b
+where a.col6=b.id
 and b.sfsbj=1))
-group by xzqh
+group by col6
 union all
-select a.xzqh xzqh,sl from(
-select temp1.xzqh,count(temp1.jjdbh) sl from temp1,temp2
-where temp1.bjdh=temp2.bjdh
-and (cast(temp1.bjsj as date)-cast(temp2.bjsj as date))*24*60>10
-and (cast(temp1.bjsj as date)-cast(temp2.bjsj as date))*24*60<60
-group by temp1.xzqh )a,
-zd_xzqh b
-where a.xzqh=b.id
+select a.col6 col6,sl from(
+select temp1.col6,count(temp1.col1) sl from temp1,temp2
+where temp1.col3=temp2.col3
+and (cast(temp1.col2 as date)-cast(temp2.col2 as date))*24*60>10
+and (cast(temp1.col2 as date)-cast(temp2.col2 as date))*24*60<60
+group by temp1.col6 )a,
+zd_col6 b
+where a.col6=b.id
 and b.sfsbj<>1)c,
-zd_xzqh d
-where c.xzqh=d.id
+zd_col6 d
+where c.col6=d.id
 order by 1
 >;
 
 /* 写入到结果表 */
 for (var i = 0;i < result1.length; i++) {
   var id = snowflake();
-  var xzqh = result1[i].XZQH;
-  var xzqhName = result1[i].NAME;
-  var sl = result1[i].SL;
+  var col6 = result1[i].xx;
+  var col6Name = result1[i].xxx;
+  var sl = result1[i].xx;
   $<zlgl::
-    insert into stat_cfbj_history(id,xzqh,xzqh_name,ksbjsj,jsbjsj,sl) values ('{{id}}','{{xzqh}}','{{xzqhName}}','{{ksbjsj}}','{{jsbjsj}}','{{sl}}')
+    insert into stat_cfbj_history(id,col6,col6_name,kscol2,jscol2,sl) values ('{{id}}','{{col6}}','{{col6Name}}','{{kscol2}}','{{jscol2}}','{{sl}}')
   >;
 }
 
