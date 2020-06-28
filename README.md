@@ -18,7 +18,7 @@
 
 ### 使用示例1
 
-与前端配合，轻松实现web sql
+与前端配合（https://github.com/DLX4/mlsql-web），轻松实现web sql
 
 ![15933374141135](./images/15933374141135.png)
 
